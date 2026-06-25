@@ -1,0 +1,138 @@
+{
+  "name": "ppcore.dll - GRAPELOADER - APT29 (Wine Campaign)",
+  "versions": {
+    "attack": "19",
+    "navigator": "5.1.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "MITRE ATT&CK mapping based on static and dynamic analysis of ppcore.dll (GRAPELOADER) from APT29 Wine campaign. Includes obfuscation, persistence, C2 communication, and defense evasion techniques.",
+  "techniques": [
+    {
+      "techniqueID": "T1566.001",
+      "comment": "Phishing emails impersonating high-ranking European figures (agencies, institutions, ministries, or individuals). The email body encourages the victim to click a malicious link by pretending to be an invitation to a wine tasting event (hence the name 'Wine').",
+      "enabled": true,
+      "score": 100
+    },
+    {
+      "techniqueID": "T1566.002",
+      "comment": "The phishing email contains a malicious link that closely resembles the official website URL of the impersonated entity. This link either downloads an archive containing malicious executables and DLLs, or directly downloads GRAPELOADER (APT29's DLL loader).",
+      "enabled": true,
+      "score": 95
+    },
+    {
+      "techniqueID": "T1036.002",
+      "comment": "The malware copies files to C:\\Users\\User\\AppData\\Local\\POWERPNT\\ to masquerade as a legitimate PowerPoint-related directory, and uses the registry entry name 'POWERPNT' to blend in.",
+      "enabled": true,
+      "score": 75
+    },
+    {
+      "techniqueID": "T1204.001",
+      "comment": "The victim is required to click the malicious link in the phishing email to initiate the download of the archive containing ppcore.dll, AppvIsvSubsystems64.dll, and wine.EXE.",
+      "enabled": true,
+      "score": 80
+    },
+    {
+      "techniqueID": "T1204.002",
+      "comment": "The victim must execute wine.EXE which loads ppcore.dll (GRAPELOADER). The archive contains three files: ppcore.dll (main DLL), AppvIsvSubsystems64.dll, and wine.EXE (executable that loads the DLLs).",
+      "enabled": true,
+      "score": 65
+    },
+    {
+      "techniqueID": "T1574.002",
+      "comment": "wine.EXE is responsible for loading ppcore.dll (GRAPELOADER). The executable acts as a loader for the malicious DLL, which in turn installs the WINELOADER backdoor. This represents DLL side-loading where a legitimate-looking executable loads a malicious DLL.",
+      "enabled": true,
+      "score": 95
+    },
+    {
+      "techniqueID": "T1055.003",
+      "comment": "The suspended thread technique combined with PAGE_NOACCESS then PAGE_EXECUTE_READWRITE memory protection changes is consistent with Thread Execution Hijacking. Sequence: VirtualAlloc (RW) → write shellcode → NtProtectVirtualMemory(PAGE_NOACCESS) → CreateThread(suspended) → Sleep(10s) → NtProtectVirtualMemory(PAGE_EXECUTE_READWRITE) → Sleep(10s) → ResumeThread. PAGE_NOACCESS is used to evade AV/EDR memory scanning before the thread resumes.",
+      "enabled": true,
+      "score": 90
+    },
+    {
+      "techniqueID": "T1218.011",
+      "comment": "Based on JoeSandbox process tree analysis (not personally confirmed by direct static or dynamic analysis), the shellcode copies loaddll64.exe and vmtools.dll to the desktop, then launches loaddll64.exe, invoking rundll32.exe to load/execute the DLL using a legitimate system binary for malicious purposes.",
+      "enabled": true,
+      "score": 60
+    },
+    {
+      "techniqueID": "T1620",
+      "comment": "Inferred from JoeSandbox behavioral analysis (not personally confirmed by direct static or dynamic analysis): the downloaded HTTP response content is assumed to be shellcode placed directly into allocated memory and executed via a new thread. The payload progressively loads what is needed for the final DLL (vmtools.dll / WINELOADER) without touching disk during initial execution.",
+      "enabled": true,
+      "score": 45
+    },
+    {
+      "techniqueID": "T1547.001",
+      "comment": "ppcore.dll ensures persistence using InstallPersistenceRegKey. It copies the archive contents to C:\\Users\\User\\AppData\\Local\\POWERPNT\\, then creates a registry key under SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run with entry name 'POWERPNT' pointing to wine.EXE. Uses dynamically resolved APIs: RegCreateKeyExW and RegSetValueExW.",
+      "enabled": true,
+      "score": 95
+    },
+    {
+      "techniqueID": "T1027",
+      "comment": "String obfuscation targeting Windows API function names and libraries. Four functions handle this, these are custom names: GetEncryptedDataOf, GetDecrypted/DecryptData, ResolveFunction, and ErasePointerDestination (zeros memory after use).",
+      "enabled": true,
+      "score": 80
+    },
+    {
+      "techniqueID": "T1027.002",
+      "comment": "The malware uses encrypted/embedded strings decrypted at runtime, including API function names, library names (kernel32, advapi32, winhttp, ntdll), paths, user agent, and registry key path.",
+      "enabled": true,
+      "score": 80
+    },
+    {
+      "techniqueID": "T1140",
+      "comment": "Decryption of embedded strings at runtime using GetDecrypted/DecryptData, these are custom names. Decrypted strings include API names, DLL names, and configuration strings (C2: ophibre.com, user agent, registry path, POST /blog.php).",
+      "enabled": true,
+      "score": 75
+    },
+    {
+      "techniqueID": "T1497.003",
+      "comment": "Two consecutive Sleep(10s) calls: first after creating the suspended thread, second after changing memory protection to PAGE_EXECUTE_READWRITE, before ResumeThread. Might be used to thwart time-based sandbox analysis.",
+      "enabled": true,
+      "score": 50
+    },
+    {
+      "techniqueID": "T1553.004",
+      "comment": "WinHttpSetOption configured with flag 0x3300 to ignore SSL/TLS certificate errors (SECURITY_FLAG_IGNORE_CERT_DATE_INVALID | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_UNKNOWN_CA), allowing C2 communication with invalid or self-signed certificates.",
+      "enabled": true,
+      "score": 70
+    },
+    {
+      "techniqueID": "T1082",
+      "comment": "System information (username, machine name, process name, hexadecimal string) collected and sent in the POST request body (0x648 bytes) to the C2 server via WinHttpSendRequest.",
+      "enabled": true,
+      "score": 80
+    },
+    {
+      "techniqueID": "T1033",
+      "comment": "Username collected and transmitted to the C2 server as part of the POST request body alongside machine name and process name.",
+      "enabled": true,
+      "score": 80
+    },
+    {
+      "techniqueID": "T1057",
+      "comment": "Process name collected and transmitted to the C2 server as part of the POST request body.",
+      "enabled": true,
+      "score": 80
+    },
+    {
+      "techniqueID": "T1071.001",
+      "comment": "C2 communication over HTTPS via WinHTTP. Connects to ophibre.com:443, POST to /blog.php, Chrome 132 user agent. Uses WinHttpOpen, WinHttpConnect, WinHttpOpenRequest, WinHttpSendRequest, WinHttpReceiveResponse, WinHttpQueryHeaders, WinHttpReadData.",
+      "enabled": true,
+      "score": 90
+    },
+    {
+      "techniqueID": "T1105",
+      "comment": "Payload downloaded from ophibre.com/blog.php after persistence installation. Directly observed in static analysis: WinHttpQueryHeaders checks Content-Length (0x20000005) and HTTP 200 status (0xc8), VirtualAlloc allocates memory of the retrieved size, WinHttpReadData writes the HTTP response into it. Shellcode dropping loaddll64.exe and vmtools.dll to the desktop is inferred from JoeSandbox behavioral analysis.",
+      "enabled": true,
+      "score": 75
+    },
+    {
+      "techniqueID": "T1106",
+      "comment": "Native Windows APIs resolved dynamically at runtime via ResolveFunction (custom name) after string decryption: kernel32 (CreateDirectoryW, CopyFileW, VirtualAlloc, CreateThread, ResumeThread), advapi32 (RegCreateKeyExW, RegSetValueExW), winhttp (WinHttp*), ntdll (NtProtectVirtualMemory).",
+      "enabled": true,
+      "score": 80
+    }
+  ]
+}
