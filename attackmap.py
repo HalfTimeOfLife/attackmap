@@ -103,7 +103,7 @@ def load_layer(layer_path):
         data = json.load(f)
     return data
 
-def enrich_layer(layer: dict, attack: MitreAttackData) -> dict[str, list[dict]]:
+def enrich_layer(layer, attack, min_score):
     """Load layer techniques and enrich them with ATT&CK tactic metadata.
 
     Techniques with enabled=false are skipped. Techniques belonging to
@@ -112,6 +112,7 @@ def enrich_layer(layer: dict, attack: MitreAttackData) -> dict[str, list[dict]]:
     Args:
         layer (dict): Parsed ATT&CK Navigator layer JSON.
         attack (MitreAttackData): Loaded ATT&CK data.
+        min_score (int): Minimum score threshold for including techniques.
 
     Returns:
         dict[str, list[dict]]: Mapping of tactic shortname to a list of
@@ -120,11 +121,11 @@ def enrich_layer(layer: dict, attack: MitreAttackData) -> dict[str, list[dict]]:
     tactic_map = defaultdict(list)
     
     for technique in layer.get('techniques', []):
-        if not technique.get('enabled', True):
+        tech_score = technique.get('score', 0)
+        if not technique.get('enabled', True) or tech_score < min_score:
             continue
 
         tid = technique.get('techniqueID')
-        score = technique.get('score', 0)
         comment = technique.get('comment', '')
         
         tactic_shortnames, name = get_technique_info(attack, tid)
@@ -139,7 +140,7 @@ def enrich_layer(layer: dict, attack: MitreAttackData) -> dict[str, list[dict]]:
         for shortname in tactic_shortnames:
             tactic_map[shortname].append({
                 'id': tid,
-                'score': score,
+                'score': tech_score,
                 'name': name,
                 'comment': comment
             })
@@ -412,13 +413,19 @@ def main():
     parser.add_argument('--title',  default=None,  help='Title displayed on the heatmap (default: layer name)')
     parser.add_argument('--format', choices=['png', 'svg', 'pdf', 'all'], default='png',
                         help='Output format (default: png)')
+    parser.add_argument('--min-score', type=int, default=0, help='Minimum score to include a technique (default: 0)')
     args = parser.parse_args()
+
+    min_score = args.min_score
+    if min_score < 0 or min_score > 100:
+        print("[!] Invalid --min-score value. Must be between 0 and 100.")
+        return
 
     attack = load_attack_data(args.stix)
     tactic_order = get_tactic_order(attack)
     layer = load_layer(args.layer)
     title = args.title if args.title is not None else layer['name']
-    tactic_map = enrich_layer(layer, attack)
+    tactic_map = enrich_layer(layer, attack, min_score)
 
     columns = build_columns(tactic_order, tactic_map)
     if not columns:

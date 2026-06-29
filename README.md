@@ -42,18 +42,35 @@ python attackmap.py \
   --stix   <enterprise-attack.json> \
   --output <output/heatmap> \
   --title  "<Heatmap title>" \
-  --format <png|svg|pdf|all>
+  --format <png|svg|pdf|all> \
+  --min-score <0-100>
 ```
  
-| Argument   | Required | Default      | Description                                        |
-|------------|----------|--------------|----------------------------------------------------|
-| `--layer`  | yes      | —            | ATT&CK Navigator JSON layer file                   |
-| `--stix`   | yes      | —            | Enterprise ATT&CK STIX bundle (JSON)               |
-| `--output` | yes      | —            | Output file path (extension overridden by `--format`) |
-| `--title`  | no       | Layer name   | Title displayed on the heatmap                     |
-| `--format` | no       | `png`        | Output format: `png`, `svg`, `pdf`, or `all`       |
+| Argument      | Required | Default    | Description                                        |
+|---------------|----------|------------|----------------------------------------------------|
+| `--layer`     | yes      | —          | ATT&CK Navigator JSON layer file                   |
+| `--stix`      | yes      | —          | Enterprise ATT&CK STIX bundle (JSON)               |
+| `--output`    | yes      | —          | Output file path (extension overridden by `--format`) |
+| `--title`     | no       | Layer name | Title displayed on the heatmap                     |
+| `--format`    | no       | `png`      | Output format: `png`, `svg`, `pdf`, or `all`       |
+| `--min-score` | no       | `0`      | Minimum score threshold (0–100)                    |
+
  
 > Using `--format all` generates PNG, SVG, and PDF in a single run.
+
+### Filtering by score
+
+Use `--min-score` to display only techniques above a confidence threshold:
+
+```bash
+python attackmap.py \
+  --layer example-layer.json \
+  --stix enterprise-attack.json \
+  --output heatmap \
+  --min-score 80
+```
+
+This renders only techniques with a score ≥ 80, useful for isolating confirmed detections from inferred ones.
  
 ---
 

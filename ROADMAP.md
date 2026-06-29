@@ -2,20 +2,7 @@
 
 This document describes the planned release schedule for attackmap. Each version ships one feature.
 
-Current version: **v1.0**
-
----
-
-## v1.1 — `--min-score` filter
-
-**Feature: Minimum score filtering**
-
-Add a CLI argument to exclude techniques below a confidence threshold before rendering.
-
-- `--min-score INT` argument (0–100) in `main()`
-- Filter applied in `enrich_layer` after the `enabled` check: techniques with `score < min_score` are skipped
-- Allows isolating confirmed techniques (e.g. `--min-score 80`) from inferred ones
-- Default: `0` (no filtering, current behavior preserved)
+Current version: **v1.1**
 
 ---
 
@@ -31,6 +18,7 @@ Add a `html` output format producing a fully self-contained interactive heatmap.
 - Output: single `.html` file with no external dependencies (`include_plotlyjs='cdn'` or `include_plotlyjs='inline'` for offline)
 - `--format` gains `html` as a valid choice alongside `png`, `svg`, `pdf`, `all`
 - Existing static rendering pipeline (`render_heatmap`) is unchanged
+- `--version` flag
 
 ---
 
@@ -38,5 +26,5 @@ Add a `html` output format producing a fully self-contained interactive heatmap.
 
 | Version | Feature                  | Status  |
 |---------|--------------------------|---------|
-| v1.1    | `--min-score` CLI filter | Planned |
+| v1.1    | `--min-score` CLI filter | Shipped |
 | v1.2    | Interactive HTML output  | Planned |
