@@ -5,6 +5,8 @@ __pycache__
 *.png
 *.svg
 *.pdf
+*.html
 !docs/*.png
 !docs/*.svg
 !docs/*.pdf
+!docs/*.html
