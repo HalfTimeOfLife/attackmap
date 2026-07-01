@@ -1,4 +1,5 @@
 import argparse
+import html
 import json
 import matplotlib
 import os
@@ -402,18 +403,263 @@ def render_heatmap(columns, header_spans, title, output_path, output_format):
     plt.close(fig)
     print(f"[+] Heatmap saved → {output_path}")
 
+# --- Rendering (HTML) ----------------------------------------------------------
+
+def render_html(columns, header_spans, title, output_path):
+    """Generate an interactive HTML heatmap.
+
+    Args:
+        columns (list[tuple]): List of column tuples as returned by build_columns.
+        header_spans (list[tuple]): List of header span tuples as returned by build_header_spans.
+        title (str): Title to display on the heatmap.
+        output_path (str): Path to save the generated file.
+
+    Returns:
+        None
+    """
+
+    def get_color_for_score(score):
+        colors = [
+            (0.0,   (0.961, 0.961, 0.961)),
+            (0.33,  (1.000, 0.800, 0.800)),
+            (0.66,  (1.000, 0.400, 0.400)),
+            (1.0,   (0.800, 0.000, 0.000)),
+        ]
+        t = score / 100.0
+        for i in range(len(colors) - 1):
+            if t <= colors[i+1][0]:
+                ratio = (t - colors[i][0]) / (colors[i+1][0] - colors[i][0])
+                r = colors[i][1][0] + ratio * (colors[i+1][1][0] - colors[i][1][0])
+                g = colors[i][1][1] + ratio * (colors[i+1][1][1] - colors[i][1][1])
+                b = colors[i][1][2] + ratio * (colors[i+1][1][2] - colors[i][1][2])
+                return f'#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}'
+        return '#cc0000'
+
+    # --- CSS ---
+    css_styles = """
+    :root {
+        --bg-color: #12122a;
+        --header-bg: #2a2a4a;
+        --cell-border: #333355;
+        --text-light: #ccccdd;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: white;
+        margin: 0;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+    #main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow-x: auto;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .matrix-container {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    .tactic-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .tactic-group-header {
+        background-color: var(--header-bg);
+        border: 1px solid #444466;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-align: center;
+        color: var(--text-light);
+        margin-bottom: 4px;
+    }
+    .tactic-subcolumns {
+        display: flex;
+        gap: 6px;
+    }
+    .tactic-column {
+        flex: 1;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .technique-cell {
+        border: 1px solid var(--cell-border);
+        border-radius: 6px;
+        padding: 8px;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+        color: #111111;
+    }
+    .technique-cell:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 8px rgba(255,255,255,0.2);
+    }
+    .tech-name { font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; text-align: center;}
+    .tech-id { font-size: 0.75rem; font-weight: bold; opacity: 1; text-align: center; margin-top: 2px; }
+    
+    #sidebar {
+        width: 350px;
+        background-color: #1a1a3a;
+        border-left: 1px solid #333355;
+        padding: 25px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        overflow-y: auto;
+    }
+    .sidebar-placeholder {
+        color: #777799;
+        font-style: italic;
+        text-align: center;
+        margin-top: 50px;
+    }
+    .btn-mitre {
+        display: inline-block;
+        background-color: #cc0000;
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        text-align: center;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    .btn-mitre:hover { background-color: #aa0000; }
+    .score-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: #333355;
+        color: white;
+        font-weight: bold;
+    }
+    #sidebar code {
+        display: inline-block;
+        font-size: 0.95rem;
+        background-color: #333355;
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: #ffffff;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+    }
+    """
+
+    # --- JavaScript ---
+    js_script = """
+    function showDetails(el) {
+    const sidebar = document.getElementById('sidebar');
+    const name = el.dataset.name;
+    const id = el.dataset.id;
+    const score = el.dataset.score;
+    const comment = el.dataset.comment;
+    const urlId = id.replace('.', '/');
+    const mitreUrl = `https://attack.mitre.org/techniques/${urlId}/`;
+
+    let commentHtml = comment ? `<p><strong>Comment:</strong></p><p style="white-space: pre-wrap; font-size:0.9rem; color:#b0b0d0;">${comment}</p>` : '<p><i>No comment available for this technique.</i></p>';
+
+    sidebar.innerHTML = `
+        <h2>Technique Details</h2>
+        <hr style="border-color: #333355;">
+        <h3>${name}</h3>
+        <p><strong>ID:</strong> <code>${id}</code></p>
+        <p><strong>Score:</strong> <span class="score-badge">${score}/100</span></p>
+        ${commentHtml}
+        <a href="${mitreUrl}" target="_blank" class="btn-mitre">View on MITRE ATT&CK ↗</a>
+    `;
+}
+    """
+
+    matrix_html = '<div class="matrix-container">'
+    
+    for c_start, c_end, label in header_spans:
+        matrix_html += f'<div class="tactic-group">'
+        matrix_html += f'<div class="tactic-group-header">{label}</div>'
+        matrix_html += '<div class="tactic-subcolumns">'
+        
+        for col_i in range(c_start, c_end):
+            _, _, techniques, _ = columns[col_i]
+            matrix_html += '<div class="tactic-column">'
+            
+            for tech in techniques:
+                score = tech['score']
+                bg_color = get_color_for_score(score)
+                
+                matrix_html += f"""
+                <div class="technique-cell" style="background-color: {bg_color};"
+                    data-name="{html.escape(tech['name'])}"
+                    data-id="{tech['id']}"
+                    data-score="{score}"
+                    data-comment="{html.escape(tech['comment'])}"
+                    onclick="showDetails(this)">
+                    <div class="tech-name">{html.escape(tech['name'])}</div>
+                    <div class="tech-id">{tech['id']}</div>
+                </div>
+                """
+            matrix_html += '</div>'
+            
+        matrix_html += '</div>'
+        matrix_html += '</div>'
+        
+    matrix_html += '</div>'
+
+    # --- Final HTML assembly ---
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{title}</title>
+    <style>{css_styles}</style>
+</head>
+<body>
+    <div id="main-content">
+        <div class="header">
+            <h2>{title}</h2>
+            <div style="color: #9999bb; font-size: 0.85rem;">MITRE ATT&CK Enterprise v19 · Interactive Heatmap</div>
+        </div>
+        {matrix_html}
+    </div>
+    <div id="sidebar">
+        <div class="sidebar-placeholder">
+            <p>← Click on a technique to view its details and the MITRE ATT&CK link.</p>
+        </div>
+    </div>
+    <script>{js_script}</script>
+</body>
+</html>
+"""
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"[+] Interactive HTML heatmap saved → {output_path}")
 
 # --- Entrypoint ----------------------------------------------------------------
 
 def main():
-    parser = argparse.ArgumentParser(description='ATT&CK Navigator layer to heatmap (png/svg/pdf)')
+    parser = argparse.ArgumentParser(description='ATT&CK Navigator layer to heatmap (png/svg/pdf/html)')
     parser.add_argument('--layer',  required=True, help='Path to ATT&CK Navigator JSON layer')
     parser.add_argument('--stix',   required=True, help='Path to Enterprise ATT&CK STIX bundle')
     parser.add_argument('--output', required=True, help='Output base path (extension ignored, derived from --format)')
     parser.add_argument('--title',  default=None,  help='Title displayed on the heatmap (default: layer name)')
-    parser.add_argument('--format', choices=['png', 'svg', 'pdf', 'all'], default='png',
+    parser.add_argument('--format', choices=['png', 'svg', 'pdf', 'html', 'all'], default='png',
                         help='Output format (default: png)')
     parser.add_argument('--min-score', type=int, default=0, help='Minimum score to include a technique (default: 0)')
+    parser.add_argument('--version', action='version', version='%(prog)s 1.2',
+                    help="Display program version and leave.")
     args = parser.parse_args()
 
     min_score = args.min_score
@@ -437,14 +683,20 @@ def main():
 
     header_spans = build_header_spans(columns)
 
-    formats = ['png', 'svg', 'pdf'] if args.format == 'all' else [args.format]
-    
+    if args.format == 'all':
+        formats = ['png', 'svg', 'pdf', 'html']
+    else:
+        formats = [args.format]
+
     for output_format in formats:
         base_path, ext = os.path.splitext(args.output)
         base_path = base_path if ext else args.output
         output_path = f"{base_path}.{output_format}"
-        render_heatmap(columns, header_spans, title, output_path, output_format)
 
+        if output_format == 'html':
+            render_html(columns, header_spans, title, output_path)
+        else:
+            render_heatmap(columns, header_spans, title, output_path, output_format)
 
 if __name__ == '__main__':
     main()

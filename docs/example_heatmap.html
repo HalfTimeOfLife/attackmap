@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ppcore.dll - GRAPELOADER - APT29 (Wine Campaign)</title>
+    <style>
+    :root {
+        --bg-color: #12122a;
+        --header-bg: #2a2a4a;
+        --cell-border: #333355;
+        --text-light: #ccccdd;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: white;
+        margin: 0;
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+    #main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow-x: auto;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .matrix-container {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    .tactic-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .tactic-group-header {
+        background-color: var(--header-bg);
+        border: 1px solid #444466;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-align: center;
+        color: var(--text-light);
+        margin-bottom: 4px;
+    }
+    .tactic-subcolumns {
+        display: flex;
+        gap: 6px;
+    }
+    .tactic-column {
+        flex: 1;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .technique-cell {
+        border: 1px solid var(--cell-border);
+        border-radius: 6px;
+        padding: 8px;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+        color: #111111;
+    }
+    .technique-cell:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 8px rgba(255,255,255,0.2);
+    }
+    .tech-name { font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; text-align: center;}
+    .tech-id { font-size: 0.75rem; font-weight: bold; opacity: 1; text-align: center; margin-top: 2px; }
+    
+    #sidebar {
+        width: 350px;
+        background-color: #1a1a3a;
+        border-left: 1px solid #333355;
+        padding: 25px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        overflow-y: auto;
+    }
+    .sidebar-placeholder {
+        color: #777799;
+        font-style: italic;
+        text-align: center;
+        margin-top: 50px;
+    }
+    .btn-mitre {
+        display: inline-block;
+        background-color: #cc0000;
+        color: white;
+        text-decoration: none;
+        padding: 10px;
+        text-align: center;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    .btn-mitre:hover { background-color: #aa0000; }
+    .score-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: #333355;
+        color: white;
+        font-weight: bold;
+    }
+    #sidebar code {
+        display: inline-block;
+        font-size: 0.95rem;
+        background-color: #333355;
+        padding: 3px 8px;
+        border-radius: 4px;
+        color: #ffffff;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+    }
+    </style>
+</head>
+<body>
+    <div id="main-content">
+        <div class="header">
+            <h2>ppcore.dll - GRAPELOADER - APT29 (Wine Campaign)</h2>
+            <div style="color: #9999bb; font-size: 0.85rem;">MITRE ATT&CK Enterprise v19 · Interactive Heatmap</div>
+        </div>
+        <div class="matrix-container"><div class="tactic-group"><div class="tactic-group-header">Initial Access</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #cc0000;"
+                    data-name="Spearphishing Attachment"
+                    data-id="T1566.001"
+                    data-score="100"
+                    data-comment="Phishing emails impersonating high-ranking European figures (agencies, institutions, ministries, or individuals). The email body encourages the victim to click a malicious link by pretending to be an invitation to a wine tasting event (hence the name &#x27;Wine&#x27;)."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Spearphishing Attachment</div>
+                    <div class="tech-id">T1566.001</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #d30f0f;"
+                    data-name="Spearphishing Link"
+                    data-id="T1566.002"
+                    data-score="95"
+                    data-comment="The phishing email contains a malicious link that closely resembles the official website URL of the impersonated entity. This link either downloads an archive containing malicious executables and DLLs, or directly downloads GRAPELOADER (APT29&#x27;s DLL loader)."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Spearphishing Link</div>
+                    <div class="tech-id">T1566.002</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Execution</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="Malicious Link"
+                    data-id="T1204.001"
+                    data-score="80"
+                    data-comment="The victim is required to click the malicious link in the phishing email to initiate the download of the archive containing ppcore.dll, AppvIsvSubsystems64.dll, and wine.EXE."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Malicious Link</div>
+                    <div class="tech-id">T1204.001</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ff6969;"
+                    data-name="Malicious File"
+                    data-id="T1204.002"
+                    data-score="65"
+                    data-comment="The victim must execute wine.EXE which loads ppcore.dll (GRAPELOADER). The archive contains three files: ppcore.dll (main DLL), AppvIsvSubsystems64.dll, and wine.EXE (executable that loads the DLLs)."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Malicious File</div>
+                    <div class="tech-id">T1204.002</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #d30f0f;"
+                    data-name="DLL Side-Loading"
+                    data-id="T1574.002"
+                    data-score="95"
+                    data-comment="wine.EXE is responsible for loading ppcore.dll (GRAPELOADER). The executable acts as a loader for the malicious DLL, which in turn installs the WINELOADER backdoor. This represents DLL side-loading where a legitimate-looking executable loads a malicious DLL."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">DLL Side-Loading</div>
+                    <div class="tech-id">T1574.002</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="Native API"
+                    data-id="T1106"
+                    data-score="80"
+                    data-comment="Native Windows APIs resolved dynamically at runtime via ResolveFunction (custom name) after string decryption: kernel32 (CreateDirectoryW, CopyFileW, VirtualAlloc, CreateThread, ResumeThread), advapi32 (RegCreateKeyExW, RegSetValueExW), winhttp (WinHttp*), ntdll (NtProtectVirtualMemory)."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Native API</div>
+                    <div class="tech-id">T1106</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Persistence</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #d30f0f;"
+                    data-name="Registry Run Keys / Startup Folder"
+                    data-id="T1547.001"
+                    data-score="95"
+                    data-comment="ppcore.dll ensures persistence using InstallPersistenceRegKey. It copies the archive contents to C:\Users\User\AppData\Local\POWERPNT\, then creates a registry key under SOFTWARE\Microsoft\Windows\CurrentVersion\Run with entry name &#x27;POWERPNT&#x27; pointing to wine.EXE. Uses dynamically resolved APIs: RegCreateKeyExW and RegSetValueExW."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Registry Run Keys / Startup Folder</div>
+                    <div class="tech-id">T1547.001</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Privilege Escalation</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #db1d1d;"
+                    data-name="Thread Execution Hijacking"
+                    data-id="T1055.003"
+                    data-score="90"
+                    data-comment="The suspended thread technique combined with PAGE_NOACCESS then PAGE_EXECUTE_READWRITE memory protection changes is consistent with Thread Execution Hijacking. Sequence: VirtualAlloc (RW) → write shellcode → NtProtectVirtualMemory(PAGE_NOACCESS) → CreateThread(suspended) → Sleep(10s) → NtProtectVirtualMemory(PAGE_EXECUTE_READWRITE) → Sleep(10s) → ResumeThread. PAGE_NOACCESS is used to evade AV/EDR memory scanning before the thread resumes."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Thread Execution Hijacking</div>
+                    <div class="tech-id">T1055.003</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #d30f0f;"
+                    data-name="Registry Run Keys / Startup Folder"
+                    data-id="T1547.001"
+                    data-score="95"
+                    data-comment="ppcore.dll ensures persistence using InstallPersistenceRegKey. It copies the archive contents to C:\Users\User\AppData\Local\POWERPNT\, then creates a registry key under SOFTWARE\Microsoft\Windows\CurrentVersion\Run with entry name &#x27;POWERPNT&#x27; pointing to wine.EXE. Uses dynamically resolved APIs: RegCreateKeyExW and RegSetValueExW."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Registry Run Keys / Startup Folder</div>
+                    <div class="tech-id">T1547.001</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Stealth</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #f14b4b;"
+                    data-name="Right-to-Left Override"
+                    data-id="T1036.002"
+                    data-score="75"
+                    data-comment="The malware copies files to C:\Users\User\AppData\Local\POWERPNT\ to masquerade as a legitimate PowerPoint-related directory, and uses the registry entry name &#x27;POWERPNT&#x27; to blend in."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Right-to-Left Override</div>
+                    <div class="tech-id">T1036.002</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #d30f0f;"
+                    data-name="DLL Side-Loading"
+                    data-id="T1574.002"
+                    data-score="95"
+                    data-comment="wine.EXE is responsible for loading ppcore.dll (GRAPELOADER). The executable acts as a loader for the malicious DLL, which in turn installs the WINELOADER backdoor. This represents DLL side-loading where a legitimate-looking executable loads a malicious DLL."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">DLL Side-Loading</div>
+                    <div class="tech-id">T1574.002</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #db1d1d;"
+                    data-name="Thread Execution Hijacking"
+                    data-id="T1055.003"
+                    data-score="90"
+                    data-comment="The suspended thread technique combined with PAGE_NOACCESS then PAGE_EXECUTE_READWRITE memory protection changes is consistent with Thread Execution Hijacking. Sequence: VirtualAlloc (RW) → write shellcode → NtProtectVirtualMemory(PAGE_NOACCESS) → CreateThread(suspended) → Sleep(10s) → NtProtectVirtualMemory(PAGE_EXECUTE_READWRITE) → Sleep(10s) → ResumeThread. PAGE_NOACCESS is used to evade AV/EDR memory scanning before the thread resumes."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Thread Execution Hijacking</div>
+                    <div class="tech-id">T1055.003</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ff7878;"
+                    data-name="Rundll32"
+                    data-id="T1218.011"
+                    data-score="60"
+                    data-comment="Based on JoeSandbox process tree analysis (not personally confirmed by direct static or dynamic analysis), the shellcode copies loaddll64.exe and vmtools.dll to the desktop, then launches loaddll64.exe, invoking rundll32.exe to load/execute the DLL using a legitimate system binary for malicious purposes."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Rundll32</div>
+                    <div class="tech-id">T1218.011</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ffa6a6;"
+                    data-name="Reflective Code Loading"
+                    data-id="T1620"
+                    data-score="45"
+                    data-comment="Inferred from JoeSandbox behavioral analysis (not personally confirmed by direct static or dynamic analysis): the downloaded HTTP response content is assumed to be shellcode placed directly into allocated memory and executed via a new thread. The payload progressively loads what is needed for the final DLL (vmtools.dll / WINELOADER) without touching disk during initial execution."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Reflective Code Loading</div>
+                    <div class="tech-id">T1620</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="Obfuscated Files or Information"
+                    data-id="T1027"
+                    data-score="80"
+                    data-comment="String obfuscation targeting Windows API function names and libraries. Four functions handle this, these are custom names: GetEncryptedDataOf, GetDecrypted/DecryptData, ResolveFunction, and ErasePointerDestination (zeros memory after use)."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Obfuscated Files or Information</div>
+                    <div class="tech-id">T1027</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="Software Packing"
+                    data-id="T1027.002"
+                    data-score="80"
+                    data-comment="The malware uses encrypted/embedded strings decrypted at runtime, including API function names, library names (kernel32, advapi32, winhttp, ntdll), paths, user agent, and registry key path."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Software Packing</div>
+                    <div class="tech-id">T1027.002</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #f14b4b;"
+                    data-name="Deobfuscate/Decode Files or Information"
+                    data-id="T1140"
+                    data-score="75"
+                    data-comment="Decryption of embedded strings at runtime using GetDecrypted/DecryptData, these are custom names. Decrypted strings include API names, DLL names, and configuration strings (C2: ophibre.com, user agent, registry path, POST /blog.php)."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Deobfuscate/Decode Files or Information</div>
+                    <div class="tech-id">T1140</div>
+                </div>
+                </div><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #ff9797;"
+                    data-name="Time Based Checks"
+                    data-id="T1497.003"
+                    data-score="50"
+                    data-comment="Two consecutive Sleep(10s) calls: first after creating the suspended thread, second after changing memory protection to PAGE_EXECUTE_READWRITE, before ResumeThread. Might be used to thwart time-based sandbox analysis."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Time Based Checks</div>
+                    <div class="tech-id">T1497.003</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Defense Impairment</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #f95a5a;"
+                    data-name="Install Root Certificate"
+                    data-id="T1553.004"
+                    data-score="70"
+                    data-comment="WinHttpSetOption configured with flag 0x3300 to ignore SSL/TLS certificate errors (SECURITY_FLAG_IGNORE_CERT_DATE_INVALID | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_UNKNOWN_CA), allowing C2 communication with invalid or self-signed certificates."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Install Root Certificate</div>
+                    <div class="tech-id">T1553.004</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Discovery</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #ff9797;"
+                    data-name="Time Based Checks"
+                    data-id="T1497.003"
+                    data-score="50"
+                    data-comment="Two consecutive Sleep(10s) calls: first after creating the suspended thread, second after changing memory protection to PAGE_EXECUTE_READWRITE, before ResumeThread. Might be used to thwart time-based sandbox analysis."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Time Based Checks</div>
+                    <div class="tech-id">T1497.003</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="System Information Discovery"
+                    data-id="T1082"
+                    data-score="80"
+                    data-comment="System information (username, machine name, process name, hexadecimal string) collected and sent in the POST request body (0x648 bytes) to the C2 server via WinHttpSendRequest."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">System Information Discovery</div>
+                    <div class="tech-id">T1082</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="System Owner/User Discovery"
+                    data-id="T1033"
+                    data-score="80"
+                    data-comment="Username collected and transmitted to the C2 server as part of the POST request body alongside machine name and process name."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">System Owner/User Discovery</div>
+                    <div class="tech-id">T1033</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #ea3b3b;"
+                    data-name="Process Discovery"
+                    data-id="T1057"
+                    data-score="80"
+                    data-comment="Process name collected and transmitted to the C2 server as part of the POST request body."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Process Discovery</div>
+                    <div class="tech-id">T1057</div>
+                </div>
+                </div></div></div><div class="tactic-group"><div class="tactic-group-header">Command And Control</div><div class="tactic-subcolumns"><div class="tactic-column">
+                <div class="technique-cell" style="background-color: #db1d1d;"
+                    data-name="Web Protocols"
+                    data-id="T1071.001"
+                    data-score="90"
+                    data-comment="C2 communication over HTTPS via WinHTTP. Connects to ophibre.com:443, POST to /blog.php, Chrome 132 user agent. Uses WinHttpOpen, WinHttpConnect, WinHttpOpenRequest, WinHttpSendRequest, WinHttpReceiveResponse, WinHttpQueryHeaders, WinHttpReadData."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Web Protocols</div>
+                    <div class="tech-id">T1071.001</div>
+                </div>
+                
+                <div class="technique-cell" style="background-color: #f14b4b;"
+                    data-name="Ingress Tool Transfer"
+                    data-id="T1105"
+                    data-score="75"
+                    data-comment="Payload downloaded from ophibre.com/blog.php after persistence installation. Directly observed in static analysis: WinHttpQueryHeaders checks Content-Length (0x20000005) and HTTP 200 status (0xc8), VirtualAlloc allocates memory of the retrieved size, WinHttpReadData writes the HTTP response into it. Shellcode dropping loaddll64.exe and vmtools.dll to the desktop is inferred from JoeSandbox behavioral analysis."
+                    onclick="showDetails(this)">
+                    <div class="tech-name">Ingress Tool Transfer</div>
+                    <div class="tech-id">T1105</div>
+                </div>
+                </div></div></div></div>
+    </div>
+    <div id="sidebar">
+        <div class="sidebar-placeholder">
+            <p>← Click on a technique to view its details and the MITRE ATT&CK link.</p>
+        </div>
+    </div>
+    <script>
+    function showDetails(el) {
+    const sidebar = document.getElementById('sidebar');
+    const name = el.dataset.name;
+    const id = el.dataset.id;
+    const score = el.dataset.score;
+    const comment = el.dataset.comment;
+    const urlId = id.replace('.', '/');
+    const mitreUrl = `https://attack.mitre.org/techniques/${urlId}/`;
+
+    let commentHtml = comment ? `<p><strong>Comment:</strong></p><p style="white-space: pre-wrap; font-size:0.9rem; color:#b0b0d0;">${comment}</p>` : '<p><i>No comment available for this technique.</i></p>';
+
+    sidebar.innerHTML = `
+        <h2>Technique Details</h2>
+        <hr style="border-color: #333355;">
+        <h3>${name}</h3>
+        <p><strong>ID:</strong> <code>${id}</code></p>
+        <p><strong>Score:</strong> <span class="score-badge">${score}/100</span></p>
+        ${commentHtml}
+        <a href="${mitreUrl}" target="_blank" class="btn-mitre">View on MITRE ATT&CK ↗</a>
+    `;
+}
+    </script>
+</body>
+</html>
